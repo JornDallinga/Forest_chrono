@@ -1,44 +1,64 @@
 
 ############################################################
-Buffer_Point <- function(Countrycode, BufferDistance) {
+Buffer_Point <- function(mydata, BufferDistance) {
   
   
   NeedUTMOutput <- F #Set to True if used to convert it to UTM.
+
+  ## Selecting unique chronosequences
+  unique_test <- unique(mydata$Chronosequence)
+  select_chrono <- subset(mydata, grepl(unique_test[1+j], Chronosequence, fixed=TRUE))
+  Buffer_list <- list()
   
-  CountryShape <- getData('GADM', country = Countrycode, level=1)
-  coordsys <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs +towgs84=0,0,0")
-  spTransform(CountryShape, coordsys)
-  Spat <- SpatialPoints(data.frame(x = mydata$x[1 + j], y = mydata$y[1 + j]), proj4string = CRS(proj4string(CountryShape)))
-  Spat
+  t <- 1
+  for (i in 1:length(select_chrono)){
+    CountryShape <- getData('GADM', country = as.character(select_chrono[t,1]), level=1)
+    coordsys <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs +towgs84=0,0,0")
+    spTransform(CountryShape, coordsys)
+    Spat <- SpatialPoints(data.frame(x = select_chrono$x[t], y = select_chrono$y[t]), proj4string = CRS(proj4string(CountryShape)))
+    
+    # Pinpoint UTM location in UTM grid.
+    X = Spat@coords[1,1]
+    Y = Spat@coords[1,2]
+    UTMLocation <- utm_zone(x = X, y = Y)
+    
+    # Make location ready for projection change.
+    Zone <- substr(UTMLocation, 1, 2)
+    Hemisphere <- substr(UTMLocation, 3,3)
+    
+    # Hemisphere <- "N"
+    # Hemisphere <- "S"
+    
+    # Assign String values for CRS input.
+    if(Hemisphere == "N") {
+      HemiText <- "+north"
+    } else if (Hemisphere == "S") {
+      HemiText <- "+south"
+    } else stop("Not a correct Hemisphere given")
+    ZoneText = paste("+zone=", Zone, sep = "")
+    
+    # Combine prepared strings for final input string.
+    CRSText <- paste("+proj=utm", ZoneText, HemiText, sep = " ")
+    
+    # Transform WGS to UTM.
+    PointsUTM <- spTransform(Spat, CRS(CRSText))
+    
+    # Buffers all the points.
+    BufferUTM <- gBuffer(PointsUTM, width=BufferDistance)
+    # Convert to WGS
+    BufferWGS <- spTransform(BufferUTM, CRS("+proj=longlat +datum=WGS84"))
+                             
+    # Add buffer to list
+    Buffer_list[length(Buffer_list)+1] <- BufferWGS  
+    t <- t + 1                         
+  }
   
-  # Pinpoint UTM location in UTM grid.
-  X = Spat@coords[1,1]
-  Y = Spat@coords[1,2]
-  UTMLocation <- utm_zone(x = X, y = Y)
-  
-  # Make location ready for projection change.
-  Zone <- substr(UTMLocation, 1, 2)
-  Hemisphere <- substr(UTMLocation, 3,3)
-  
-  # Hemisphere <- "N"
-  # Hemisphere <- "S"
-  
-  # Assign String values for CRS input.
-  if(Hemisphere == "N") {
-    HemiText <- "+north"
-  } else if (Hemisphere == "S") {
-    HemiText <- "+south"
-  } else stop("Not a correct Hemisphere given")
-  ZoneText = paste("+zone=", Zone, sep = "")
-  
-  # Combine prepared strings for final input string.
-  CRSText <- paste("+proj=utm", ZoneText, HemiText, sep = " ")
-  
-  # Transform WGS to UTM.
-  PointsUTM <- spTransform(Spat, CRS(CRSText))
-  
-  # Buffers all the points.
-  BufferUTM <- gBuffer(PointsUTM, width=BufferDistance)
+  # Add point 
+  Chrono_buffer <- sapply(union, Buffer_list)
+  Chrono_buffer <- lapply(length(Buffer_list),union, y = Buffer_list)
+  Chrono_buffer <- merge(BufferWGS, Chronobuffer)
+                           
+  test <- union(Buffer_list[[1]], Buffer_list[[2]])
   
   if (NeedUTMOutput == F) {
     BufferWGS <- spTransform(BufferUTM, CRS("+proj=longlat +datum=WGS84"))
