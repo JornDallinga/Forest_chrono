@@ -1,17 +1,15 @@
 
 ############################################################
-Buffer_Point <- function(mydata, BufferDistance) {
+Buffer_Point <- function(BufferDistance, select_chrono) {
   
   
   NeedUTMOutput <- F #Set to True if used to convert it to UTM.
 
   ## Selecting unique chronosequences
-  unique_test <- unique(mydata$Chronosequence)
-  select_chrono <- subset(mydata, grepl(unique_test[1+j], Chronosequence, fixed=TRUE))
-  Buffer_list <- list()
+  Buffer_union <- NULL
   
   t <- 1
-  for (i in 1:length(select_chrono)){
+  for (i in 1:nrow(select_chrono)){
     CountryShape <- getData('GADM', country = as.character(select_chrono[t,1]), level=1)
     coordsys <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs +towgs84=0,0,0")
     spTransform(CountryShape, coordsys)
@@ -43,26 +41,23 @@ Buffer_Point <- function(mydata, BufferDistance) {
     # Transform WGS to UTM.
     PointsUTM <- spTransform(Spat, CRS(CRSText))
     
-    # Buffers all the points.
+    # Buffers the point
     BufferUTM <- gBuffer(PointsUTM, width=BufferDistance)
     # Convert to WGS
-    BufferWGS <- spTransform(BufferUTM, CRS("+proj=longlat +datum=WGS84"))
-                             
-    # Add buffer to list
-    Buffer_list[length(Buffer_list)+1] <- BufferWGS  
-    t <- t + 1                         
+    BufferWGS <- spTransform(BufferUTM, CRS("+proj=longlat +datum=WGS84")) 
+    
+    if (t == 1){
+      Buffer_union <- union(BufferWGS)
+    } else {
+      Buffer_union <- gUnion(BufferWGS, Buffer_union)
+    }
+    t <- t + 1 
   }
   
-  # Add point 
-  Chrono_buffer <- sapply(union, Buffer_list)
-  Chrono_buffer <- lapply(length(Buffer_list),union, y = Buffer_list)
-  Chrono_buffer <- merge(BufferWGS, Chronobuffer)
-                           
-  test <- union(Buffer_list[[1]], Buffer_list[[2]])
   
   if (NeedUTMOutput == F) {
     BufferWGS <- spTransform(BufferUTM, CRS("+proj=longlat +datum=WGS84"))
-    saveRDS(BufferWGS, file = "Data/BufferWGS.rds", ascii = FALSE, version = NULL,
+    saveRDS(Buffer_union, file = "Data/BufferWGS.rds", ascii = FALSE, version = NULL,
             compress = TRUE, refhook = NULL)
   } else if (NeedUTMOutput == T) {
     saveRDS(BufferUTM, file = "Data/BufferUTM.rds", ascii = FALSE, version = NULL,
