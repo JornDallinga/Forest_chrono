@@ -19,7 +19,9 @@ if (!require(devtools)) install.packages("devtools")
 if (!require(spatstat)) install.packages('car')
 if (!require(spatstat)) install.packages('fsmb')
 if (!require(spatstat)) install.packages('RCurl')
+if (!require(MASS)) install.packages('MASS')
 if (!require(MODIS)) install.packages("MODIS", repos="http://R-Forge.R-project.org")
+if (!require(caret)) install.packages('caret')
 devtools::install_github('JornDallinga/VCF')
 
 
@@ -36,6 +38,8 @@ library (plyr)
 library (xlsx)
 library (car)
 library (RCurl)
+library (caret)
+library (MASS)
 
 
 
@@ -59,6 +63,7 @@ source("R/calc_mean.R")
 source("R/plot_Figures.R")
 source("R/Write_chrono_excel.R")
 source("R/vif_func.R")
+source("R/Confusion_Matrix.R")
 
 
 
@@ -77,9 +82,9 @@ dir.create(file.path('data/extract_hansen'), showWarnings = FALSE)
 ### Set variables by user
 #Countrycode <- "CRI"      # See: http://en.wikipedia.org/wiki/ISO_3166-1
 #Chronosequence <- NULL    # Chronosequence within the country
-Year <- 2000             # Only applies to Sexton script
-BufferDistance <- 500 # Distance in meters
-Threshold <- 30           # Cells with values greater than threshold are classified as 'Forest'
+Year <- 2000               # Only applies to Sexton script
+BufferDistance <- 5000     # Distance in meters
+Threshold <- 60            # Cells with values greater than threshold are classified as 'Forest'
 
 
 setInternet2(use = TRUE) 
@@ -87,12 +92,11 @@ setInternet2(use = TRUE)
 ###------------------------------------- Create Matrix for results ----------------------
 
 ## reading excel file
-mydata <- read.xlsx("Chrono_Coords_list_R_Ready.xlsx", 2)
-countcoords <- nrow(mydata)
-
+mydata <- read.xlsx("Chrono_Coords_list_R_Ready.xlsx", 3)
+unique_list <- unique(mydata$Chronosequence)
 
 #creating empty matrix
-mat <- matrix(, nrow = countcoords, ncol = 49)
+mat <- matrix(, nrow = length(unique_list), ncol = 48)
 
 #creating empty dataframe
 mat <- data.frame(mat)
@@ -108,28 +112,28 @@ j <- 0
 
 ###------------------------------------- Run Script -----------------------------------
 
-for(i in 1:countcoords) {
+for(i in 1:length(unique_list)) {
   
   # create progress bar
   pb <- winProgressBar(title = "progress bar", min = 0,
-                       max = countcoords, width = 300)
+                       max = length(unique_list), width = 300)
   Sys.sleep(0.1)
-  setWinProgressBar(pb, i, title=paste(round(i/countcoords*100, 0),
+  setWinProgressBar(pb, i, title=paste(round(i/length(unique_list)*100, 0),
                                         "% done"))
   
+  select_chrono <- subset(mydata, grepl(unique_list[1+j], Chronosequence, fixed=TRUE))
   
   ## reading country code and chronosequence from mydata
-  Countrycode <- levels(mydata$Country[1 + j])[mydata$Country[1 + j]]
-  Chronosequence <- levels(mydata$Chronosequence[1 + j])[mydata$Chronosequence[1 + j]]
-  Plot_ID <- as.character(mydata$Plot_ID[1 + j])
+  Countrycode <- as.character(unique(select_chrono$Country))
+  Chronosequence <- as.character(unique(select_chrono$Chronosequence))
 
   ###------------------------------------ Run functions -----------------------------------
 
   ## Create buffer around point
-  Buffer_Point(Countrycode, BufferDistance) #Places a .rds file in the data folder
+  Buffer_Point(BufferDistance, select_chrono) #Places a .rds file in the data folder
   
   ## Analysis Forest data
-  matrix_list <- Forest_Analysis(Year = Year, Countrycode = Countrycode, Chronosequence = Chronosequence, Plot_ID = Plot_ID, BufferDistance = BufferDistance, Threshold = Threshold)
+  matrix_list <- Forest_Analysis(Year = Year, Countrycode = Countrycode, Chronosequence = Chronosequence, BufferDistance = BufferDistance, Threshold = Threshold)
   
   # Clear directory to prevent extraction errors
   unlink("data/BufferWGS.rds", recursive = FALSE)
@@ -138,10 +142,10 @@ for(i in 1:countcoords) {
   j <- 1 + j
   
   ## write to excel and RDS and assign colunm names
-  if (i == countcoords){
+  if (i == length(unique_list)){
     Write_fun(matrix_list)
-    mat_list <- lapply(matrix_list, calc_mean)
-    lapply(1:length(mat_list), function(i) write.xlsx(mat_list[[i]], file = sprintf("output/Excel/mean_Buffer%s_Threshold%s_Year%s.xlsx", BufferDistance, Threshold, Year), sheetName = names(mat_list[i]), append = T))
+    # mat_list <- lapply(matrix_list, calc_mean)
+    # lapply(1:length(matrix_list), function(i) write.xlsx(mat_list[[i]], file = sprintf("output/Excel/mean_Buffer%s_Threshold%s_Year%s.xlsx", BufferDistance, Threshold, Year), sheetName = names(mat_list[i]), append = T))
     
     ## Writing individual chronosequences excel files to folder
     Write_chrono_excel(matrix_list)
