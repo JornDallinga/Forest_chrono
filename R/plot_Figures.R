@@ -5,7 +5,7 @@ plot_Figures <- function(Figure_output, j){
   dir.create(file.path(sprintf('output/Figures/%s/Buffer_%s', Chronosequence, BufferDistance)), showWarnings = FALSE)
   dir.create(file.path(sprintf('output/Figures/%s/Buffer_%s/Threshold_%s', Chronosequence, BufferDistance, Threshold)), showWarnings = FALSE)
   
-  png(filename= sprintf("output/Figures/%s/Buffer_%s/Threshold_%s/PlotID_%s_Year%s_Threshold%s_Buffer%s.png", Chronosequence, BufferDistance, Threshold, Plot_ID, Year, Threshold, BufferDistance), width = 1200, height = 800)  
+  png(filename= sprintf("output/Figures/%s/Buffer_%s/Threshold_%s/Year%s_Threshold%s_Buffer%s.png", Chronosequence, BufferDistance, Threshold, Year, Threshold, BufferDistance), width = 1200, height = 800)  
   
   k <- 1
   par(mfrow=c(2,2), mar=c(3, 3, 3, 15), cex = 1.1)
@@ -61,7 +61,7 @@ plot_Figures <- function(Figure_output, j){
     }
 
     
-    plot(Figure_output[[k]], legend = F, col = my_col, main = sprintf("%s, %s, PlotID: %s", names(Figure_output[[k]]), Year, Plot_ID))
+    plot(Figure_output[[k]], legend = F, col = my_col, main = sprintf("%s, Year: %s", names(Figure_output[[k]]), Year))
     par(xpd = TRUE, cex = 1.1)
     # Create y axes point for placing legend
     set_y <- (ymin(Figure_output[[k]]) + ymax(Figure_output[[k]])) / 2

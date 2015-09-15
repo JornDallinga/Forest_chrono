@@ -24,10 +24,6 @@ Mosaic_Raster <- function(x_list, dir, extract, buffer, pr_filename){
     find_uniq <- unique(res_frame)
     if (ncol(find_uniq) > 1){
       new_list <- lapply(new_list, resample, y = new_list[[1]], method = "ngb")
-      
-      #ind <- table(apply(res_frame, 1, paste, collapse = "/")) 
-      #ind <- which.max(ind) 
-      #mode_res <- as.numeric(strsplit(names(ind), "/")[[1]])
 
     } else {
       

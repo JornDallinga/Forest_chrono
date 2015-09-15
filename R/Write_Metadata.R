@@ -3,8 +3,6 @@ Write_metadata <- function(mat, Countrycode = Countrycode, Chronosequence = Chro
   count <- count + 1
   mat[i, count] <- paste(Chronosequence)
   count <- count + 1
-  mat[i, count] <- paste(Plot_ID)
-  count <- count + 1
   mat[i, count] <- paste(Year)
   count <- count + 1
   mat[i, count] <- paste(BufferDistance)
