@@ -1,10 +1,11 @@
-Forest_Analysis <- function(Year = Year, Countrycode = Countrycode, Plot_ID = Plot_ID, Chronosequence = Chronosequence, BufferDistance = BufferDistance, Threshold = Threshold){
+Forest_Analysis <- function(Year = Year, BufferDistance = BufferDistance, Threshold = Threshold, Countrycode = Countrycode, Chronosequence = Chronosequence){
   
-  caption <- c("Country","Chronosequence","Plot_ID", "Year", "Buffer", "Threshold", "x_coordinates", "y_coordinates", "Forest_cover", "Water_cover", "Cloud_cover")
+  caption <- c("Country","Chronosequence", "Year", "Buffer", "Threshold", "x_coordinates", "y_coordinates", "Forest_cover", "Water_cover", "Cloud_cover")
+
   
   if (Year == 1990){
     ## writing metadata to matrix
-    mat3 <- Write_metadata(mat = mat3 ,Countrycode = Countrycode, Chronosequence = Chronosequence, Plot_ID = Plot_ID, Year = Year, BufferDistance = BufferDistance, Threshold = 30 )
+    mat3 <- Write_metadata(mat = mat3 ,Countrycode = Countrycode, Chronosequence = Chronosequence, Year = Year, BufferDistance = BufferDistance, Threshold = 30 )
     
     ## calculating forest cover raster
     K_1990 <- Kim_fun(Year = 19902000)
@@ -17,18 +18,18 @@ Forest_Analysis <- function(Year = Year, Countrycode = Countrycode, Plot_ID = Pl
       SDMK_1990 <- SDM_function(K_1990[[1]])
       
       ## reading number of columns from SDM function output
-      SDMK_col <- ncol(SDMK_1990) + 11
+      SDMK_col <- ncol(SDMK_1990) + 10
       
       ## writing results to matrix
-      mat3[i, 12:SDMK_col] <- SDMK_1990
+      mat3[i, 11:SDMK_col] <- SDMK_1990
       
       ## Forest cover calc
       FC_K_1990 <- Forest_cover(K_1990[[1]])
-      mat3[i, 9] <- FC_K_1990
+      mat3[i, 8] <- FC_K_1990
       ## Water
-      mat3[i, 10] <- K_1990[[2]]
+      mat3[i, 9] <- K_1990[[2]]
       ## Cloud
-      mat3[i, 11] <- K_1990[[3]]
+      mat3[i, 10] <- K_1990[[3]]
       
       
       
@@ -55,7 +56,7 @@ Forest_Analysis <- function(Year = Year, Countrycode = Countrycode, Plot_ID = Pl
     
   } else if (Year == 2000){
     ## writing metadata to matrix
-    mat <- Write_metadata(mat = mat ,Countrycode = Countrycode, Chronosequence = Chronosequence, Plot_ID = Plot_ID, Year = Year, BufferDistance = BufferDistance, Threshold = Threshold)
+    mat <- Write_metadata(mat = mat ,Countrycode = Countrycode, Chronosequence = Chronosequence, Year = Year, BufferDistance = BufferDistance, Threshold = Threshold)
     
     Figure_output <- list()
     ## calculating forest cover raster
@@ -68,57 +69,59 @@ Forest_Analysis <- function(Year = Year, Countrycode = Countrycode, Plot_ID = Pl
       SDMS_2000 <- SDM_function(S[[1]])
       
       ## reading number of columns from SDM function output
-      SDMS_col <- ncol(SDMS_2000) + 11
+      SDMS_col <- ncol(SDMS_2000) + 10
       
       ## writing results to matrix
-      mat[i, 12:SDMS_col] <- SDMS_2000
+      mat[i, 11:SDMS_col] <- SDMS_2000
       
       ## Forest cover, water, cloud calc
       FC_S_2000 <- Forest_cover(S[[1]])
-      mat[i, 9] <- FC_S_2000
+      mat[i, 8] <- FC_S_2000
       ## Water
-      mat[i, 10] <- S[[2]]
+      mat[i, 9] <- S[[2]]
       ## Cloud
-      mat[i, 11] <- S[[3]]
+      mat[i, 10] <- S[[3]]
       
       Figure_output[length(Figure_output)+1] <- S[[4]]
     }
     
 
     ## writing metadata to matrix
-    mat1 <- Write_metadata(mat = mat1,Countrycode = Countrycode, Chronosequence = Chronosequence, Plot_ID = Plot_ID, Year = Year, BufferDistance = BufferDistance, Threshold = Threshold )
+    mat1 <- Write_metadata(mat = mat1,Countrycode = Countrycode, Chronosequence = Chronosequence, Year = Year, BufferDistance = BufferDistance, Threshold = Threshold )
     
     ## calculating forest cover raster
     H <- Hansen(Threshold, Year)
-    Figure_output[length(Figure_output)+1] <- H[[3]]
     
     # Resample Hansen dataset for similar dimensions
     if (length(S) < 2){
       
     } else {
       H[[3]] <- resample(H[[3]], S[[4]], method = "ngb")
+      Confusion_Matrix(Sexton = S[[4]], Hansen = H[[3]])
     }
+    
+    Figure_output[length(Figure_output)+1] <- H[[3]]
     
     ## applying SDM function to forest cover raster
     SDMH <- SDM_function(H[[1]])
     
     ## reading number of columns from SDM function output
-    SDMH_col <- ncol(SDMH) + 11
+    SDMH_col <- ncol(SDMH) + 10
     
     ## writing results to matrix
-    mat1[i, 12:SDMH_col] <- SDMH
+    mat1[i, 11:SDMH_col] <- SDMH
     
     ## Forest cover calc
     FC_H_2000 <- Forest_cover(H[[1]])
-    mat1[i, 9] <- FC_H_2000
+    mat1[i, 8] <- FC_H_2000
     ## Water
-    mat1[i, 10] <- H[[2]]
+    mat1[i, 9] <- H[[2]]
     ## Cloud
-    mat1[i, 11] <- 0
+    mat1[i, 10] <- 0
     
     
     ## writing metadata to matrix
-    mat2 <- Write_metadata(mat = mat2 ,Countrycode = Countrycode, Chronosequence = Chronosequence, Plot_ID = Plot_ID, Year = Year, BufferDistance = BufferDistance, Threshold = 30 )
+    mat2 <- Write_metadata(mat = mat2 ,Countrycode = Countrycode, Chronosequence = Chronosequence, Year = Year, BufferDistance = BufferDistance, Threshold = 30 )
 
     
     ## calculating forest cover raster
@@ -131,18 +134,18 @@ Forest_Analysis <- function(Year = Year, Countrycode = Countrycode, Plot_ID = Pl
       SDMK_2000 <- SDM_function(K_2000[[1]])
       
       ## reading number of columns from SDM function output
-      SDMK_col <- ncol(SDMK_2000) + 11
+      SDMK_col <- ncol(SDMK_2000) + 10
       
       ## writing results to matrix
-      mat2[i, 12:SDMK_col] <- SDMK_2000
+      mat2[i, 11:SDMK_col] <- SDMK_2000
       
       ## Forest cover calc
       FC_K_2000 <- Forest_cover(K_2000[[1]])
-      mat2[i, 9] <- FC_K_2000
+      mat2[i, 8] <- FC_K_2000
       ## Water
-      mat2[i, 10] <- K_2000[[2]]
+      mat2[i, 9] <- K_2000[[2]]
       ## Cloud
-      mat2[i, 11] <- K_2000[[3]]
+      mat2[i, 10] <- K_2000[[3]]
       
       Figure_output[length(Figure_output)+1] <- K_2000[[4]]
     }
@@ -166,7 +169,7 @@ Forest_Analysis <- function(Year = Year, Countrycode = Countrycode, Plot_ID = Pl
     mat2 <<- mat2
     
     matrix_list <- list(Sexton_2000 = mat, Hansen_2000 = mat1, Kim_2000 = mat2)
-
+    
     
     ## listing raster files and creating forest cover figure
     #Plot_Raster <- list(S[[1]], H[[1]], K_2000[[1]])
@@ -178,7 +181,7 @@ Forest_Analysis <- function(Year = Year, Countrycode = Countrycode, Plot_ID = Pl
     
   } else if (Year == 2005){
     ## writing metadata to matrix
-    mat4 <- Write_metadata(mat = mat4 ,Countrycode = Countrycode, Chronosequence = Chronosequence, Plot_ID = Plot_ID, Year = Year, BufferDistance = BufferDistance, Threshold = Threshold )
+    mat4 <- Write_metadata(mat = mat4 ,Countrycode = Countrycode, Chronosequence = Chronosequence, Year = Year, BufferDistance = BufferDistance, Threshold = Threshold )
     
     Figure_output <- list()
     ## calculating forest cover raster
@@ -191,18 +194,18 @@ Forest_Analysis <- function(Year = Year, Countrycode = Countrycode, Plot_ID = Pl
       SDMS_2005 <- SDM_function(S[[1]])
       
       ## reading number of columns from SDM function output
-      SDMS_col <- ncol(SDMS_2005) + 11
+      SDMS_col <- ncol(SDMS_2005) + 10
       
       ## writing results to matrix
-      mat4[i, 12:SDMS_col] <- SDMS_2005
+      mat4[i, 11:SDMS_col] <- SDMS_2005
       
       ## Forest cover calc
       FC_S_2005 <- Forest_cover(S[[1]])
-      mat4[i, 9] <- FC_S_2005
+      mat4[i, 8] <- FC_S_2005
       ## Water
-      mat4[i, 10] <- S[[2]]
+      mat4[i, 9] <- S[[2]]
       ## Cloud
-      mat4[i, 11] <- S[[3]]
+      mat4[i, 10] <- S[[3]]
       
       Figure_output[length(Figure_output)+1] <- S[[4]]
       
@@ -211,7 +214,7 @@ Forest_Analysis <- function(Year = Year, Countrycode = Countrycode, Plot_ID = Pl
     
     
     ## writing metadata to matrix
-    mat5 <- Write_metadata(mat = mat5 ,Countrycode = Countrycode, Chronosequence = Chronosequence, Plot_ID = Plot_ID, Year = Year, BufferDistance = BufferDistance, Threshold = 30 )
+    mat5 <- Write_metadata(mat = mat5 ,Countrycode = Countrycode, Chronosequence = Chronosequence, Year = Year, BufferDistance = BufferDistance, Threshold = 30 )
     
     ## calculating forest cover raster
     K_2005 <- Kim_fun(Year = 20002005, Data = 2005)
@@ -223,18 +226,18 @@ Forest_Analysis <- function(Year = Year, Countrycode = Countrycode, Plot_ID = Pl
       SDMK_2005 <- SDM_function(K_2005[[1]])
       
       ## reading number of columns from SDM function output
-      SDMK_col <- ncol(SDMK_2005) + 11
+      SDMK_col <- ncol(SDMK_2005) + 10
       
       ## writing results to matrix
-      mat5[i, 12:SDMK_col] <- SDMK_2005
+      mat5[i, 11:SDMK_col] <- SDMK_2005
       
       ## Forest cover calc
       FC_K_2005 <- Forest_cover(K_2005[[1]])
-      mat5[i, 9] <- FC_K_2005
+      mat5[i, 8] <- FC_K_2005
       ## Water
-      mat5[i, 10] <- K_2005[[2]]
+      mat5[i, 9] <- K_2005[[2]]
       ## Cloud
-      mat5[i, 11] <- K_2005[[3]]
+      mat5[i, 10] <- K_2005[[3]]
       
       Figure_output[length(Figure_output)+1] <- K_2005[[4]]
     }
@@ -267,7 +270,7 @@ Forest_Analysis <- function(Year = Year, Countrycode = Countrycode, Plot_ID = Pl
   } else if (Year == 2012) {
     
     ## writing metadata to matrix
-    mat6 <- Write_metadata(mat = mat6 ,Countrycode = Countrycode, Chronosequence = Chronosequence, Plot_ID = Plot_ID, Year = Year, BufferDistance = BufferDistance, Threshold = Threshold )
+    mat6 <- Write_metadata(mat = mat6 ,Countrycode = Countrycode, Chronosequence = Chronosequence, Year = Year, BufferDistance = BufferDistance, Threshold = Threshold )
     
     ## calculating forest cover raster
     H <- Hansen(Threshold, Year)
@@ -276,18 +279,18 @@ Forest_Analysis <- function(Year = Year, Countrycode = Countrycode, Plot_ID = Pl
     SDMH_2012 <- SDM_function(H[[1]])
     
     ## reading number of columns from SDM function output
-    SDMH_col <- ncol(SDMH_2012) + 11
+    SDMH_col <- ncol(SDMH_2012) + 10
     
     ## writing results to matrix
-    mat6[i, 12:SDMH_col] <- SDMH_2012
+    mat6[i, 11:SDMH_col] <- SDMH_2012
     
     ## Forest cover calc
     FC_H_2012 <- Forest_cover(H[[1]])
-    mat6[i, 9] <- FC_H_2012
+    mat6[i, 8] <- FC_H_2012
     ## Water
-    mat6[i, 10] <- S[[2]]
+    mat6[i, 9] <- S[[2]]
     ## Cloud
-    mat6[i, 11] <- NULL
+    mat6[i, 10] <- NULL
     
     ## assigning col names
     if (j < 1) {
