@@ -2,7 +2,7 @@ my_sheet <- read.xlsx("output/Excel/Buffer1000_Threshold30_Year2000.xlsx", "Meta
 my_sheet[3]
 test <- list.files(path = "output/Excel/Chronosequences",
            recursive=T,
-           pattern= ".xlsx"
+           pattern= "Buffer1000_Threshold30_Year2000.xlsx"
            ,full.names=T)
 
 
@@ -10,3 +10,8 @@ test <- list.files(path = "output/Excel/Chronosequences",
 test[1]
 
 lapply(1:length(test), function(i) write.xlsx(my_sheet, file = test[i], sheetName = "Metadata", append = T))
+
+
+## delete files in list
+
+do.call(file.remove,list(test))
