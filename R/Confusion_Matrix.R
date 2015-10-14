@@ -21,7 +21,7 @@ Confusion_Matrix <- function(Sexton, Hansen){
   
   tabletest <- table(Hansen,Sexton)
   
-  if ((nrow(tabletest) == ncol(tabletest)) & ((nrow(tabletest) & ncol(tabletest)) != 1)){
+  if ((nrow(tabletest) == ncol(tabletest)) & (nrow(tabletest) != 1) & (all(names(tabletest[,1]) %in% names(tabletest[1,])))) {
     outcome <- confusionMatrix(tabletest)
     
     Confusion_table <- as.data.frame.matrix(outcome$table)
