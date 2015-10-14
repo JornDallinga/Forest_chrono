@@ -108,7 +108,7 @@ Sexton <- function(Year, Threshold){
     
     # Set values and a value replacement function
     Masked_Raster[Masked_Raster < Threshold] <- 0
-    Masked_Raster[Masked_Raster >= Threshold] <- 1
+    Masked_Raster[Masked_Raster >= Threshold & Masked_Raster <= 100] <- 1
     Masked_Raster[Masked_Raster > 100] <- NA
     
     
