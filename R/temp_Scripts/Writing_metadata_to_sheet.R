@@ -2,7 +2,7 @@ my_sheet <- read.xlsx("output/Excel/Buffer1000_Threshold30_Year2000.xlsx", "Meta
 my_sheet[3]
 test <- list.files(path = "output/Excel/Chronosequences",
            recursive=T,
-           pattern= "Buffer1000_Threshold30_Year2000.xlsx"
+           pattern= "Buffer.xlsx"
            ,full.names=T)
 
 
