@@ -16,6 +16,7 @@ if (!require(rgeos)) install.packages('rgeos')
 if (!require(sp)) install.packages('sp')
 if (!require(spatstat)) install.packages('spatstat')
 if (!require(devtools)) install.packages("devtools")
+if (!require(MuMIn)) install.packages("MuMIn")
 if (!require(spatstat)) install.packages('car')
 if (!require(spatstat)) install.packages('fsmb')
 if (!require(spatstat)) install.packages('RCurl')
@@ -40,6 +41,8 @@ library (car)
 library (RCurl)
 library (caret)
 library (MASS)
+library (MuMIn)
+library (RColorBrewer)
 
 
 
@@ -82,9 +85,9 @@ dir.create(file.path('data/extract_hansen'), showWarnings = FALSE)
 ### Set variables by user
 #Countrycode <- "CRI"      # See: http://en.wikipedia.org/wiki/ISO_3166-1
 #Chronosequence <- NULL    # Chronosequence within the country
-Year <- 2000               # Only applies to Sexton script
+Year <- 1990               # Only applies to Sexton script
 BufferDistance <- 5000     # Distance in meters
-Threshold <- 60            # Cells with values greater than threshold are classified as 'Forest'
+Threshold <- 30            # Cells with values greater than threshold are classified as 'Forest'
 
 
 setInternet2(use = TRUE) 
@@ -92,7 +95,7 @@ setInternet2(use = TRUE)
 ###------------------------------------- Create Matrix for results ----------------------
 
 ## reading excel file
-mydata <- read.xlsx("Chrono_Coords_list_R_Ready.xlsx", 3)
+mydata <- read.xlsx("Chrono_Coords_list_R_Ready.xlsx", 2)
 unique_list <- unique(mydata$Chronosequence)
 
 #creating empty matrix
