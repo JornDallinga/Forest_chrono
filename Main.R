@@ -20,6 +20,8 @@ if (!require(MuMIn)) install.packages("MuMIn")
 if (!require(spatstat)) install.packages('car')
 if (!require(spatstat)) install.packages('fsmb')
 if (!require(spatstat)) install.packages('RCurl')
+if (!require(R1magic)) install.packages('R1magic')
+if (!require(plotmo)) install.packages('plotmo')
 if (!require(MASS)) install.packages('MASS')
 if (!require(MODIS)) install.packages("MODIS", repos="http://R-Forge.R-project.org")
 if (!require(caret)) install.packages('caret')
@@ -43,6 +45,8 @@ library (caret)
 library (MASS)
 library (MuMIn)
 library (RColorBrewer)
+library (plotmo)
+library (R1magic)
 
 
 
@@ -85,8 +89,8 @@ dir.create(file.path('data/extract_hansen'), showWarnings = FALSE)
 ### Set variables by user
 #Countrycode <- "CRI"      # See: http://en.wikipedia.org/wiki/ISO_3166-1
 #Chronosequence <- NULL    # Chronosequence within the country
-Year <- 1990               # Only applies to Sexton script
-BufferDistance <- 5000     # Distance in meters
+Year <- 2000               # Only applies to Sexton script
+BufferDistance <- 10000      # Distance in meters
 Threshold <- 30            # Cells with values greater than threshold are classified as 'Forest'
 
 
@@ -95,7 +99,7 @@ setInternet2(use = TRUE)
 ###------------------------------------- Create Matrix for results ----------------------
 
 ## reading excel file
-mydata <- read.xlsx("Chrono_Coords_list_R_Ready.xlsx", 2)
+mydata <- read.xlsx("Andrea_coordinates.xlsx", 2)
 unique_list <- unique(mydata$Chronosequence)
 
 #creating empty matrix
@@ -124,7 +128,7 @@ for(i in 1:length(unique_list)) {
   setWinProgressBar(pb, i, title=paste(round(i/length(unique_list)*100, 0),
                                         "% done"))
   
-  select_chrono <- subset(mydata, grepl(unique_list[1+j], Chronosequence, fixed=TRUE))
+  select_chrono <- subset(mydata, Chronosequence == as.character(unique_list[1+j]))
   
   ## reading country code and chronosequence from mydata
   Countrycode <- as.character(unique(select_chrono$Country))

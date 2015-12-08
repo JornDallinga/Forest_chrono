@@ -10,15 +10,6 @@ calc_mean <- function(mat){
   
   for (i in 1:length(unique_test)){
     select_chrono <- subset(mat, grepl(unique_test[t], Chronosequence, fixed=TRUE))
-
-    #scaled.dat <- select_chrono
-    #scaled.dat[9:49] <- scale(select_chrono[9:49], center = T, scale = apply(select_chrono[9:49], 2, sd, na.rm = TRUE))
-    #scaled.dat[9:49] <- scale(select_chrono[9:49])
-    
-    #colMeans(scaled.dat[9:49])  # faster version of apply(scaled.dat, 2, mean)
-    #scaled.dat[9:49] <- apply(scaled.dat[9:49], 2, sd)
-    
-    # mean_matrix[t,1:2] <- c(unique(select_chrono$Country), unique(select_chrono$Chronosequence))
     
     mean_matrix[t,1:2] <- c(unique(select_chrono$Country), unique(select_chrono$Chronosequence))
     mean_matrix[t,3:length(mean_matrix)]<- colMeans(select_chrono[9:length(select_chrono)])

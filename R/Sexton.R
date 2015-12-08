@@ -121,3 +121,5 @@ Sexton <- function(Year, Threshold){
   
 }  
 
+#plot(Figure_output, main = Sexton,
+    # ylim = (100))

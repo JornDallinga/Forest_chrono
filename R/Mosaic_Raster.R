@@ -1,3 +1,5 @@
+## Function mosaics plots that intersect with different tree-cover tiles
+
 Mosaic_Raster <- function(x_list, dir, extract, buffer, pr_filename){
   rast.list <- list()
   for(i in 1:length(x_list)) {

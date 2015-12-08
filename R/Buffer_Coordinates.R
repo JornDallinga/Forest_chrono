@@ -10,7 +10,7 @@ Buffer_Point <- function(BufferDistance, select_chrono) {
   
   t <- 1
   for (i in 1:nrow(select_chrono)){
-    CountryShape <- getData('GADM', country = as.character(select_chrono[t,1]), level=1)
+    CountryShape <- getData('GADM', country = as.character(select_chrono[t,'Country']), level=1)
     coordsys <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs +towgs84=0,0,0")
     spTransform(CountryShape, coordsys)
     Spat <- SpatialPoints(data.frame(x = select_chrono$x[t], y = select_chrono$y[t]), proj4string = CRS(proj4string(CountryShape)))

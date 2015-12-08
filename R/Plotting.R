@@ -1,5 +1,6 @@
 Plot_function <- function(Year, BufferDistance, Threshold, Plot_Raster){
   
+  ## plotting function for all tree-cover datasets for per year and threshold
   dir.create(file.path('output/Figures'), showWarnings = FALSE)
   
   png(filename= sprintf("output/Figures/Forestcover%s_Year%s_Threshold%s_Buffer%s.png",j, Year, Threshold, BufferDistance))  
